@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProfessorFilou.de – Link Generator & Weiterleitung</title>
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --surface-color: #f8fafc;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --accent: #2563eb;
+            --accent-hover: #1d4ed8;
+            --accent-light: #eff6ff;
+            --border-color: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .card {
+            width: 100%;
+            max-width: 480px;
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 36px 32px;
+            box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+
+        .brand-dot {
+            width: 12px;
+            height: 12px;
+            background-color: var(--accent);
+            border-radius: 50%;
+            box-shadow: 0 0 0 4px var(--accent-light);
+        }
+
+        .brand-name {
+            font-weight: 700;
+            font-size: 1.1rem;
+            letter-spacing: -0.02em;
+            color: var(--text-main);
+        }
+
+        .brand-name span {
+            color: var(--accent);
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.02em;
+        }
+
+        p.subtitle {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 24px;
+        }
+
+        .input-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text-main);
+        }
+
+        input[type="url"],
+        select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 0.95rem;
+            color: var(--text-main);
+            background: var(--bg-color);
+            transition: all 0.2s ease;
+            outline: none;
+        }
+
+        input[type="url"]:focus,
+        select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px var(--accent-light);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 13px 20px;
+            background-color: var(--accent);
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
+
+        .btn:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .btn:active {
+            transform: scale(0.99);
+        }
+
+        .result-box {
+            display: none;
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border-color);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .share-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 6px;
+        }
+
+        .share-input {
+            flex: 1;
+            padding: 10px 12px;
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            outline: none;
+        }
+
+        .btn-copy {
+            padding: 10px 16px;
+            background: var(--accent-light);
+            color: var(--accent);
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .btn-copy:hover {
+            background: var(--accent);
+            color: #ffffff;
+        }
+
+        .redirect-view {
+            display: none;
+            text-align: center;
+        }
+
+        .spinner {
+            width: 42px;
+            height: 42px;
+            border: 3.5px solid var(--accent-light);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            margin: 0 auto 20px auto;
+            animation: spin 0.8s linear infinite;
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 6px;
+            background: var(--accent-light);
+            border-radius: 99px;
+            overflow: hidden;
+            margin: 20px 0 14px 0;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--accent);
+            border-radius: 99px;
+            transition: width linear;
+        }
+
+        .target-preview {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            word-break: break-all;
+            background: var(--surface-color);
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin-top: 12px;
+        }
+
+        .direct-link {
+            display: inline-block;
+            margin-top: 16px;
+            font-size: 0.85rem;
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .direct-link:hover {
+            text-decoration: underline;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <div class="brand">
+            <div class="brand-dot"></div>
+            <div class="brand-name">Professor<span>Filou</span>.de</div>
+        </div>
+
+        <!-- Ansicht 1: Link Generator -->
+        <div id="generator-view">
+            <h1>Weiterleitungs-Link erstellen</h1>
+            <p class="subtitle">Erstelle einen teilbaren Link über ProfessorFilou.de, der Besucher kurz begrüßt und dann weiterleitet.</p>
+
+            <form id="link-form">
+                <div class="input-group">
+                    <label for="target-url">Ziel-URL (Wohin soll geleitet werden?)</label>
+                    <input type="url" id="target-url" placeholder="https://beispiel.de" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="delay-select">Aufenthaltsdauer auf ProfessorFilou.de</label>
+                    <select id="delay-select">
+                        <option value="2">2 Sekunden (Kurz)</option>
+                        <option value="3" selected>3 Sekunden (Standard)</option>
+                        <option value="5">5 Sekunden (Mittel)</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn">Teilbaren Link generieren</button>
+            </form>
+
+            <div class="result-box" id="result-box">
+                <label>Dein fertiger Link zum Teilen:</label>
+                <div class="share-row">
+                    <input type="text" id="generated-link" class="share-input" readonly>
+                    <button type="button" id="copy-btn" class="btn-copy">Kopieren</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ansicht 2: Weiterleitung aktiv -->
+        <div id="redirect-view" class="redirect-view">
+            <div class="spinner"></div>
+            <h1>Du wirst weitergeleitet...</h1>
+            <p class="subtitle" id="countdown-text">Einen kurzen Moment bitte. Du verlässt gleich ProfessorFilou.de.</p>
+
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="progress-fill"></div>
+            </div>
+
+            <div class="target-preview" id="target-display"></div>
+            <a href="#" id="manual-link" class="direct-link">Falls nichts passiert, hier klicken →</a>
+        </div>
+    </div>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const encodedTarget = params.get('to');
+        const delayParam = parseInt(params.get('t'), 10);
+
+        const generatorView = document.getElementById('generator-view');
+        const redirectView = document.getElementById('redirect-view');
+
+        if (encodedTarget) {
+            try {
+                const base64 = encodedTarget.replace(/-/g, '+').replace(/_/g, '/');
+                const targetUrl = decodeURIComponent(escape(window.atob(base64)));
+
+                const parsedUrl = new URL(targetUrl);
+                if (parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:') {
+                    startRedirect(parsedUrl.href, isNaN(delayParam) ? 3 : Math.min(Math.max(delayParam, 1), 15));
+                } else {
+                    showGenerator();
+                }
+            } catch (e) {
+                showGenerator();
+            }
+        } else {
+            showGenerator();
+        }
+
+        function showGenerator() {
+            generatorView.style.display = 'block';
+            redirectView.style.display = 'none';
+        }
+
+        function startRedirect(url, seconds) {
+            generatorView.style.display = 'none';
+            redirectView.style.display = 'block';
+
+            document.getElementById('target-display').textContent = 'Ziel: ' + url;
+            document.getElementById('manual-link').href = url;
+
+            const progressFill = document.getElementById('progress-fill');
+            const countdownText = document.getElementById('countdown-text');
+
+            setTimeout(() => {
+                progressFill.style.transitionDuration = seconds + 's';
+                progressFill.style.width = '100%';
+            }, 50);
+
+            let remaining = seconds;
+            countdownText.textContent = `Weiterleitung in ${remaining} Sekunde${remaining === 1 ? '' : 'n'}...`;
+
+            const timer = setInterval(() => {
+                remaining--;
+                if (remaining > 0) {
+                    countdownText.textContent = `Weiterleitung in ${remaining} Sekunde${remaining === 1 ? '' : 'n'}...`;
+                } else {
+                    clearInterval(timer);
+                    countdownText.textContent = 'Leite jetzt weiter...';
+                    window.location.replace(url);
+                }
+            }, 1000);
+        }
+
+        document.getElementById('link-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            let rawUrl = document.getElementById('target-url').value.trim();
+            const delay = document.getElementById('delay-select').value;
+
+            if (!/^https?:\/\//i.test(rawUrl)) {
+                rawUrl = 'https://' + rawUrl;
+            }
+
+            const encoded = window.btoa(unescape(encodeURIComponent(rawUrl)))
+                .replace(/\+/g, '-')
+                .replace(/\//g, '_')
+                .replace(/=+$/, '');
+
+            const baseUrl = window.location.origin + window.location.pathname;
+            const shareUrl = `${baseUrl}?to=${encoded}&t=${delay}`;
+
+            const resultBox = document.getElementById('result-box');
+            const generatedInput = document.getElementById('generated-link');
+
+            generatedInput.value = shareUrl;
+            resultBox.style.display = 'block';
+        });
+
+        document.getElementById('copy-btn').addEventListener('click', function() {
+            const copyInput = document.getElementById('generated-link');
+            copyInput.select();
+            copyInput.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(copyInput.value);
+
+            const btn = this;
+            const originalText = btn.textContent;
+            btn.textContent = 'Kopiert!';
+            btn.style.backgroundColor = '#10b981';
+            btn.style.color = '#ffffff';
+
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.style.backgroundColor = '';
+                btn.style.color = '';
+            }, 2000);
+        });
+    </script>
+</body>
+</html>
